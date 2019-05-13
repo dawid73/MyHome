@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@color/colorPrimary"
+
+    >
+        <ImageView android:layout_width="100dp"
+                   android:layout_height="100dp"
+                   android:src="@mipmap/domek"
+                   android:layout_centerHorizontal="true"
+                   android:layout_centerVertical="true"
+                   android:id="@+id/image_top"
+        />
+
+    </RelativeLayout>
+
+    <!-- All Context -->
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:background="@color/divider"
+                  android:orientation="vertical"
+
+    >
+        <!-- one row -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:gravity="center"
+                      android:paddingTop="10dp"
+        >
+            <android.support.v7.widget.CardView
+                    android:layout_width="160dp"
+                    android:layout_height="150dp"
+                    android:background="@drawable/background_linear"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="5dp"
+                    android:id="@+id/btn_gora"
+            >
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                    <ImageView
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
+                            android:src="@mipmap/zarowka"
+                    />
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/light_top"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                    />
+                    <View
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@color/divider"
+                            android:layout_margin="10dp"
+                    />
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Włącz światło na górze"
+                    />
+
+                </LinearLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                    android:layout_width="160dp"
+                    android:layout_height="150dp"
+                    android:background="@drawable/background_linear"
+                    android:orientation="vertical"
+                    android:id="@+id/btn_dol"
+                    android:layout_marginStart="5dp"
+            >
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                    <ImageView
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
+                            android:src="@mipmap/zarowka"
+                            android:id="@+id/ikona_swiatlo_gora"
+
+                    />
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/light_bootom"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                    />
+                    <View
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@color/divider"
+                            android:layout_margin="10dp"
+                    />
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Włącz światło na dole"
+                    />
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+
+        <!-- one row -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:gravity="center"
+                      android:paddingTop="10dp"
+        >
+            <android.support.v7.widget.CardView
+                    android:layout_width="335dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/background_linear"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="5dp"
+                    android:id="@+id/btn_wol"
+            >
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="WOL LENOVO"
+                    />
+
+                </LinearLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+
+        <!-- one row -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:gravity="center"
+                      android:paddingTop="10dp"
+        >
+            <android.support.v7.widget.CardView
+                    android:layout_width="335dp"
+                    android:layout_height="100dp"
+                    android:background="@drawable/background_linear"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="5dp"
+                    android:id="@+id/btn_alarm"
+            >
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                    <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@mipmap/alarm_czerwony"
+                            android:id="@+id/ikona_alarm"
+
+                    />
+
+                    <View
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@color/divider"
+                            android:layout_margin="10dp"
+                    />
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="WŁĄCZ ALARM"
+                    />
+
+                </LinearLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+
+        <!-- one row -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:gravity="center"
+                      android:paddingTop="10dp"
+        >
+            <android.support.v7.widget.CardView
+                    android:layout_width="335dp"
+                    android:layout_height="130dp"
+                    android:background="@drawable/background_linear"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="5dp"
+                    android:id="@+id/btn_drzwi"
+            >
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                    <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@mipmap/drzwi_niebieski"
+                            android:id="@+id/ikona_domofon"
+
+                    />
+
+                    <View
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@color/divider"
+                            android:layout_margin="10dp"
+                    />
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="OTWÓRZ DRZWI - DOMOFON"
+                    />
+
+                </LinearLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>
