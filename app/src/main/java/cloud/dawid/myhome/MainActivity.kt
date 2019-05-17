@@ -1,59 +1,58 @@
 package cloud.dawid.myhome
 
-import android.app.Activity
-import android.content.Context
+
+import android.content.Intent
 import android.os.Bundle
-import android.view.View
+import android.support.v4.app.FragmentManager
+import android.support.v7.app.AppCompatActivity
 import cloud.dawid.myhome.manager.MQTTConnectionParams
 import cloud.dawid.myhome.manager.MQTTmanager
 import cloud.dawid.myhome.protocols.UIUpdaterInterface
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_advanced.*
 import org.eclipse.paho.android.service.MqttAndroidClient
 
-class MainActivity : Activity(), UIUpdaterInterface {
+class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
-    var mqttManager: MQTTmanager? = null
 
-    // Interface methods
+
     override fun resetUIWithConnection(status: Boolean) {
 
-//        ipAddressField.isEnabled  = !status
-//        topicField.isEnabled      = !status
-//        messageField.isEnabled    = status
-//        connectBtn.isEnabled      = !status
-//        sendBtn.isEnabled         = status
-//
-//        // Update the status label.
-//        if (status){
-//            updateStatusViewWith("Connected")
-//        }else{
-//            updateStatusViewWith("Disconnected")
-//        }
     }
 
+    private val showadwance: Boolean = true
+    var mqttManager: MQTTmanager? = null
+
+
+
     override fun updateStatusViewWith(status: String) {
-//        statusLabl.text = status
+
     }
 
     override fun update(message: String) {
-//
-//        var text = messageHistoryView.text.toString()
-//        var newText = """
-//            $text
-//            $message
-//            """
-//        //var newText = text.toString() + "\n" + message +  "\n"
-//        messageHistoryView.setText(newText)
-//        messageHistoryView.setSelection(messageHistoryView.text.length)
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        connect()
+        val fm:FragmentManager = supportFragmentManager
+        val advancedFragment = AdvancedFragment()
 
-        btn_alarm.setOnClickListener { sendMessage() }
+        if(showadwance) {
+            fm.beginTransaction().add(R.id.advancedFragmentLL, advancedFragment).commit()
+        }
+
+        connect()
+        btn_alarm.setOnClickListener { sendMessage()
+
+        }
+
+        btn_drzwi.setOnClickListener {
+            val intent = Intent(this, SettingActivity::class.java)
+            startActivity(intent)
+        }
 
     }
 
@@ -75,7 +74,7 @@ class MainActivity : Activity(), UIUpdaterInterface {
 
     fun sendMessage(){
 
-        mqttManager?.publish("Test11")
+        mqttManager?.publish("0")
 
 
     }
