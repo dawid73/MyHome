@@ -1,6 +1,7 @@
 package cloud.dawid.myhome
 
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentManager
@@ -13,6 +14,15 @@ import kotlinx.android.synthetic.main.fragment_advanced.*
 import org.eclipse.paho.android.service.MqttAndroidClient
 
 class MainActivity : AppCompatActivity(), UIUpdaterInterface {
+
+
+    private var EMPTY = ""
+    private var ADRESS = "Adres serwera"
+    private var USER = "Użytkownik"
+    private var PASS = "Hasło"
+
+    private var myPreferences = "myPref"
+
 
 
 
@@ -58,19 +68,26 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
     fun connect(){
 
-        //if (!(ipAddressField.text.isNullOrEmpty() && topicField.text.isNullOrEmpty())) {
-            //var host = "tcp://" + ipAddressField.text.toString() + ":1883"
-            var host = "tcp://188.117.181.24:1883"
+        val sharedPreferences = getSharedPreferences(myPreferences, Context.MODE_PRIVATE)
+
+        val addres = sharedPreferences.getString(ADRESS, EMPTY)
+        val user = sharedPreferences.getString(USER, EMPTY)
+        val pass = sharedPreferences.getString(PASS, EMPTY)
+
+        if (!(addres.isNullOrEmpty() && user.isNullOrEmpty() && pass.isNullOrEmpty())) {
+            var host = "tcp://" + addres + ":1883"
+            //var host = "tcp://188.117.181.24:1883"
             //var topic = topicField.text.toString()
             var topic = "test1"
             var connectionParams = MQTTConnectionParams("MQTTSample",host,topic,"","")
             mqttManager = MQTTmanager(connectionParams,applicationContext,this)
             mqttManager?.connect()
-//        }else{
-//            updateStatusViewWith("Please enter all valid fields")
-//        }
+        }else{
+            updateStatusViewWith("Please enter all valid fields")
+        }
 
-    }
+        }
+
 
     fun sendMessage(){
 
