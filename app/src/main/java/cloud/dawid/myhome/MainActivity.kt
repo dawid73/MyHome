@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentManager
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import cloud.dawid.myhome.manager.MQTTConnectionParams
 import cloud.dawid.myhome.manager.MQTTmanager
 import cloud.dawid.myhome.protocols.UIUpdaterInterface
@@ -43,6 +44,20 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        val sharedPreferences = getSharedPreferences(myPreferences, Context.MODE_PRIVATE)
+
+        var isAdvanced = sharedPreferences.getBoolean("advanced", false)
+        var adress = sharedPreferences.getString("adres", "supa")
+
+        Log.d("TUTAJ JESTEM!! : ",isAdvanced.toString())
+        texttemp.setText(isAdvanced.toString())
+        texttemp2.setText(adress)
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -50,7 +65,10 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         val fm:FragmentManager = supportFragmentManager
         val advancedFragment = AdvancedFragment()
 
-        if(showadwance) {
+        val sharedPreferences = getSharedPreferences(myPreferences, Context.MODE_PRIVATE)
+
+
+        if(false) {
             fm.beginTransaction().add(R.id.advancedFragmentLL, advancedFragment).commit()
         }
 
@@ -59,7 +77,7 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
         }
 
-        btn_drzwi.setOnClickListener {
+        settings_btn.setOnClickListener {
             val intent = Intent(this, SettingActivity::class.java)
             startActivity(intent)
         }
@@ -69,6 +87,7 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
     fun connect(){
 
         val sharedPreferences = getSharedPreferences(myPreferences, Context.MODE_PRIVATE)
+
 
         val addres = sharedPreferences.getString(ADRESS, EMPTY)
         val user = sharedPreferences.getString(USER, EMPTY)

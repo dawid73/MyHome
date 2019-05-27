@@ -11,7 +11,7 @@
         android:paddingTop="40dp">
 
 
-        <TextView
+    <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Ustawienia"
@@ -36,11 +36,11 @@
                 android:layout_weight="1"
         />
         <EditText
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:text=""
-                android:ems="10"
+                android:layout_weight="1"
                 android:id="@+id/adress_properties"
 
         />
@@ -63,13 +63,14 @@
                 android:layout_weight="1"
         />
         <EditText
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:text=""
-                android:ems="10"
+                android:ems="13"
+                android:layout_weight="1"
                 android:id="@+id/user_properties"
-        />
+                android:autofillHints=""/>
 
     </LinearLayout>
 
@@ -89,17 +90,29 @@
                 android:layout_weight="1"
         />
         <EditText
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
+                android:layout_weight="1"
                 android:text=""
-                android:ems="10"
+                android:ems="13"
                 android:id="@+id/password_properties"
         />
 
 
 
     </LinearLayout>
+
+    <Switch
+            android:text="Zaawansowane"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="30dp"
+            android:id="@+id/switchadvaced"
+    />
+
 
     <LinearLayout
             android:layout_width="match_parent"
@@ -115,6 +128,7 @@
                 android:layout_height="wrap_content"/>
 
     </LinearLayout>
+
 
 
 

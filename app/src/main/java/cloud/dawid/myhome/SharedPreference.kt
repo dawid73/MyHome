@@ -17,9 +17,25 @@ class SharedPreference(val context: Context) {
         editor!!.commit()
     }
 
+
+    fun save(KEY_NAME: String, status: Boolean) {
+
+        val editor: SharedPreferences.Editor = sharedPref.edit()
+
+        editor.putBoolean(KEY_NAME, status!!)
+
+        editor.commit()
+    }
+
+
     fun getValueString(KEY_NAME: String): String? {
 
         return sharedPref.getString(KEY_NAME, null)
+    }
+
+    fun getValueBoolean(KEY_NAME: String): Boolean? {
+
+        return sharedPref.getBoolean(KEY_NAME, false)
     }
 
 
