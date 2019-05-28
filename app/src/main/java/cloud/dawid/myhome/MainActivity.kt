@@ -17,16 +17,6 @@ import org.eclipse.paho.android.service.MqttAndroidClient
 class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
 
-    private var EMPTY = ""
-    private var ADRESS = "Adres serwera"
-    private var USER = "Użytkownik"
-    private var PASS = "Hasło"
-
-    private var myPreferences = "myPref"
-
-
-
-
     override fun resetUIWithConnection(status: Boolean) {
 
     }
@@ -44,18 +34,9 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
     }
 
-    override fun onResume() {
-        super.onResume()
 
-        val sharedPreferences = getSharedPreferences(myPreferences, Context.MODE_PRIVATE)
+    
 
-        var isAdvanced = sharedPreferences.getBoolean("advanced", false)
-        var adress = sharedPreferences.getString("adres", "supa")
-
-        Log.d("TUTAJ JESTEM!! : ",isAdvanced.toString())
-        texttemp.setText(isAdvanced.toString())
-        texttemp2.setText(adress)
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,10 +46,15 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         val fm:FragmentManager = supportFragmentManager
         val advancedFragment = AdvancedFragment()
 
-        val sharedPreferences = getSharedPreferences(myPreferences, Context.MODE_PRIVATE)
+        val sharedPreference = SharedPreference(this)
 
+        var isAdvanced = sharedPreference.getValueBoolean("advanced")
+        var adress = sharedPreference.getValueString("adres")
 
-        if(false) {
+        texttemp.setText(isAdvanced.toString())
+        texttemp2.setText(adress)
+
+        if(isAdvanced!!) {
             fm.beginTransaction().add(R.id.advancedFragmentLL, advancedFragment).commit()
         }
 
@@ -86,24 +72,24 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
     fun connect(){
 
-        val sharedPreferences = getSharedPreferences(myPreferences, Context.MODE_PRIVATE)
-
-
-        val addres = sharedPreferences.getString(ADRESS, EMPTY)
-        val user = sharedPreferences.getString(USER, EMPTY)
-        val pass = sharedPreferences.getString(PASS, EMPTY)
-
-        if (!(addres.isNullOrEmpty() && user.isNullOrEmpty() && pass.isNullOrEmpty())) {
-            var host = "tcp://" + addres + ":1883"
-            //var host = "tcp://188.117.181.24:1883"
-            //var topic = topicField.text.toString()
-            var topic = "test1"
-            var connectionParams = MQTTConnectionParams("MQTTSample",host,topic,"","")
-            mqttManager = MQTTmanager(connectionParams,applicationContext,this)
-            mqttManager?.connect()
-        }else{
-            updateStatusViewWith("Please enter all valid fields")
-        }
+//        val sharedPreferences = getSharedPreferences(myPreferences, Context.MODE_PRIVATE)
+//
+//
+//        val addres = sharedPreferences.getString(ADRESS, EMPTY)
+//        val user = sharedPreferences.getString(USER, EMPTY)
+//        val pass = sharedPreferences.getString(PASS, EMPTY)
+//
+//        if (!(addres.isNullOrEmpty() && user.isNullOrEmpty() && pass.isNullOrEmpty())) {
+//            var host = "tcp://" + addres + ":1883"
+//            //var host = "tcp://188.117.181.24:1883"
+//            //var topic = topicField.text.toString()
+//            var topic = "test1"
+//            var connectionParams = MQTTConnectionParams("MQTTSample",host,topic,"","")
+//            mqttManager = MQTTmanager(connectionParams,applicationContext,this)
+//            mqttManager?.connect()
+//        }else{
+//            updateStatusViewWith("Please enter all valid fields")
+//        }
 
         }
 

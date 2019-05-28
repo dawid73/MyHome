@@ -26,7 +26,8 @@ class SettingActivity : AppCompatActivity() {
             Log.d("ADRESS TUTAJ: ", temp)
 
             adress_properties.setText(temp)
-            //adress_properties.setText("bvfvbfvf")
+
+            switchadvaced.isChecked = sharedPreference.getValueBoolean("advanced")!!
         }
 
 
@@ -41,8 +42,7 @@ class SettingActivity : AppCompatActivity() {
             sharedPreference.save("advanced", isAdwance)
             sharedPreference.save("adres", adresString)
 
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+
         }
 
 
