@@ -32,6 +32,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
             }
         })
     }
+
     fun connect(){
         val mqttConnectOptions = MqttConnectOptions()
         mqttConnectOptions.setAutomaticReconnect(true)
@@ -101,11 +102,11 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
             client.subscribe(topic, 0, null, object:IMqttActionListener {
                 override fun onSuccess(asyncActionToken:IMqttToken) {
                     Log.w("Mqtt", "Subscription!")
-                    uiUpdater?.updateStatusViewWith("Subscribed to Topic")
+                    //uiUpdater?.updateStatusViewWith("Subscribed to Topic")
                 }
                 override fun onFailure(asyncActionToken:IMqttToken, exception:Throwable) {
                     Log.w("Mqtt", "Subscription fail!")
-                    uiUpdater?.updateStatusViewWith("Falied to Subscribe to Topic")
+                   // uiUpdater?.updateStatusViewWith("Falied to Subscribe to Topic")
                 }
             })
         }
@@ -138,11 +139,11 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
 
     }
 
-    fun publish(message:String){
+    fun publish(topic:String, message:String){
         try
         {
-            var msg = "Android says:" + message
-            client.publish(this.connectionParams.topic,msg.toByteArray(),0,false,null,object :IMqttActionListener{
+
+            client.publish(topic , message.toByteArray(),1,false,null,object :IMqttActionListener{
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     Log.w("Mqtt", "Publish Success!")
                     uiUpdater?.updateStatusViewWith("Published to Topic")

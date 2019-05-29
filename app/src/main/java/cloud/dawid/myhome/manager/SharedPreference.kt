@@ -1,4 +1,4 @@
-package cloud.dawid.myhome
+package cloud.dawid.myhome.manager
 
 import android.content.Context
 import android.content.SharedPreferences

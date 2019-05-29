@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
+import cloud.dawid.myhome.manager.SharedPreference
 import kotlinx.android.synthetic.main.activity_setting.*
 
 class SettingActivity : AppCompatActivity() {
@@ -42,7 +43,8 @@ class SettingActivity : AppCompatActivity() {
             sharedPreference.save("advanced", isAdwance)
             sharedPreference.save("adres", adresString)
 
-
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
         }
 
 

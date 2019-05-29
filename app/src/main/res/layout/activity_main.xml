@@ -24,15 +24,6 @@
 
     </LinearLayout>
 
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-    android:text="dupa" android:layout_margin="20dp" android:id="@+id/texttemp"
-    />
-
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-              android:text="dupa" android:layout_margin="20dp" android:id="@+id/texttemp2"
-    />
-
-
     <!-- All Context -->
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="match_parent"

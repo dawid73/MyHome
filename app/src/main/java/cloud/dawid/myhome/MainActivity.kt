@@ -1,30 +1,24 @@
 package cloud.dawid.myhome
 
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentManager
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
+import cloud.dawid.myhome.fragments.AdvancedFragment
 import cloud.dawid.myhome.manager.MQTTConnectionParams
 import cloud.dawid.myhome.manager.MQTTmanager
+import cloud.dawid.myhome.manager.SharedPreference
 import cloud.dawid.myhome.protocols.UIUpdaterInterface
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_advanced.*
-import org.eclipse.paho.android.service.MqttAndroidClient
 
 class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
+    var mqttManager: MQTTmanager? = null
 
     override fun resetUIWithConnection(status: Boolean) {
 
     }
-
-    private val showadwance: Boolean = true
-    var mqttManager: MQTTmanager? = null
-
-
 
     override fun updateStatusViewWith(status: String) {
 
@@ -33,10 +27,6 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
     override fun update(message: String) {
 
     }
-
-
-    
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,56 +41,57 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         var isAdvanced = sharedPreference.getValueBoolean("advanced")
         var adress = sharedPreference.getValueString("adres")
 
-        texttemp.setText(isAdvanced.toString())
-        texttemp2.setText(adress)
+        connect(adress.toString())
 
+        //subscribe("test2")
+
+        // fragment z przyciskami WOL do komputerów. Sprawdza czy jest ustawiona true w zmiennej isAdvanced
         if(isAdvanced!!) {
             fm.beginTransaction().add(R.id.advancedFragmentLL, advancedFragment).commit()
         }
 
-        connect()
-        btn_alarm.setOnClickListener { sendMessage()
-
-        }
-
+        // przycisk ustawień
         settings_btn.setOnClickListener {
             val intent = Intent(this, SettingActivity::class.java)
             startActivity(intent)
         }
 
+        //
+        btn_drzwi.setOnClickListener {
+            sendMessage("opendoorintercom", "0")
+        }
+
     }
 
-    fun connect(){
 
-//        val sharedPreferences = getSharedPreferences(myPreferences, Context.MODE_PRIVATE)
-//
-//
-//        val addres = sharedPreferences.getString(ADRESS, EMPTY)
-//        val user = sharedPreferences.getString(USER, EMPTY)
-//        val pass = sharedPreferences.getString(PASS, EMPTY)
-//
-//        if (!(addres.isNullOrEmpty() && user.isNullOrEmpty() && pass.isNullOrEmpty())) {
-//            var host = "tcp://" + addres + ":1883"
-//            //var host = "tcp://188.117.181.24:1883"
-//            //var topic = topicField.text.toString()
-//            var topic = "test1"
-//            var connectionParams = MQTTConnectionParams("MQTTSample",host,topic,"","")
-//            mqttManager = MQTTmanager(connectionParams,applicationContext,this)
-//            mqttManager?.connect()
-//        }else{
-//            updateStatusViewWith("Please enter all valid fields")
-//        }
+    fun connect(adress:String){
+
+        if (true) {
+
+            var host = "tcp://" + adress + ":1883"
+            var topic = "test1"
+            var connectionParams = MQTTConnectionParams("MQTTSample",host,topic,"","")
+            mqttManager = MQTTmanager(connectionParams,applicationContext,this)
+            mqttManager?.connect()
+
+        }else{
+
+            updateStatusViewWith("Please enter all valid fields")
 
         }
 
+    }
 
-    fun sendMessage(){
 
-        mqttManager?.publish("0")
+    fun sendMessage(topic:String, message: String){
 
+        mqttManager?.publish(topic, message)
 
     }
 
+    fun subscribe(topic:String){
+        mqttManager?.subscribe("test2")
+    }
 
 }
 
