@@ -4,7 +4,10 @@ package cloud.dawid.myhome
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentManager
+import android.support.v4.app.NotificationCompat
+import android.support.v4.app.NotificationManagerCompat
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import cloud.dawid.myhome.fragments.AdvancedFragment
 import cloud.dawid.myhome.manager.MQTTConnectionParams
 import cloud.dawid.myhome.manager.MQTTmanager
@@ -26,6 +29,26 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
     override fun update(message: String) {
 
+        shownotification()
+
+    }
+
+
+    fun shownotification() {
+
+        val CHANNEL_ID = "cloud.dawid.myhome.CHANNEL_ID"
+
+        var builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.navigation_empty_icon)
+            .setContentTitle("Title")
+            .setContentText("Text")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+        with(NotificationManagerCompat.from(this)) {
+            // notificationId is a unique int for each notification that you must define
+            val notificationId = 0
+            notify(notificationId, builder.build())
+        }
     }
 
 
@@ -69,10 +92,11 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         if (true) {
 
             var host = "tcp://" + adress + ":1883"
-            var topic = "test1"
+            var topic = "test2"
             var connectionParams = MQTTConnectionParams("MQTTSample",host,topic,"","")
             mqttManager = MQTTmanager(connectionParams,applicationContext,this)
             mqttManager?.connect()
+
 
         }else{
 
@@ -90,7 +114,7 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
     }
 
     fun subscribe(topic:String){
-        mqttManager?.subscribe("test2")
+        mqttManager?.subscribe(topic)
     }
 
 }

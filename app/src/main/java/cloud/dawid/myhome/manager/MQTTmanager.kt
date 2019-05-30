@@ -1,7 +1,15 @@
 package cloud.dawid.myhome.manager
 
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Context
+import android.content.Intent
+import android.media.RingtoneManager
+import android.support.v4.app.NotificationCompat
+import android.support.v4.content.ContextCompat.getSystemService
 import android.util.Log
+import cloud.dawid.myhome.MainActivity
 import cloud.dawid.myhome.protocols.UIUpdaterInterface
 
 import org.eclipse.paho.android.service.MqttAndroidClient
@@ -50,7 +58,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
                     disconnectedBufferOptions.setPersistBuffer(false)
                     disconnectedBufferOptions.setDeleteOldestMessages(false)
                     client.setBufferOpts(disconnectedBufferOptions)
-                    subscribe(params.topic)
+                    subscribe("test3")
 
                 }
                 override fun onFailure(asyncActionToken:IMqttToken, exception:Throwable) {
@@ -102,6 +110,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
             client.subscribe(topic, 0, null, object:IMqttActionListener {
                 override fun onSuccess(asyncActionToken:IMqttToken) {
                     Log.w("Mqtt", "Subscription!")
+                    Log.w("ODEBRANE:::::::: ", "NO I DZIALA")
                     //uiUpdater?.updateStatusViewWith("Subscribed to Topic")
                 }
                 override fun onFailure(asyncActionToken:IMqttToken, exception:Throwable) {
