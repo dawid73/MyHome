@@ -27,21 +27,21 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
     }
 
-    override fun update(message: String) {
+    override fun update(message: String){
 
-        shownotification()
+        shownotification(message)
 
     }
 
 
-    fun shownotification() {
+    fun shownotification(text: String) {
 
         val CHANNEL_ID = "cloud.dawid.myhome.CHANNEL_ID"
 
         var builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.navigation_empty_icon)
             .setContentTitle("Title")
-            .setContentText("Text")
+            .setContentText(text)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         with(NotificationManagerCompat.from(this)) {
@@ -66,7 +66,6 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
         connect(adress.toString())
 
-        //subscribe("test2")
 
         // fragment z przyciskami WOL do komputerów. Sprawdza czy jest ustawiona true w zmiennej isAdvanced
         if(isAdvanced!!) {
@@ -81,8 +80,13 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
         //
         btn_drzwi.setOnClickListener {
-            sendMessage("opendoorintercom", "0")
+            //sendMessage("opendoorintercom", "0")
+            shownotification("kliknales w guzik")
         }
+
+
+        val intenetSevice = Intent(this, NotificationService::class.java)
+        startService(intenetSevice)
 
     }
 
@@ -92,11 +96,10 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         if (true) {
 
             var host = "tcp://" + adress + ":1883"
-            var topic = "test2"
+            var topic = "komunikat"
             var connectionParams = MQTTConnectionParams("MQTTSample",host,topic,"","")
             mqttManager = MQTTmanager(connectionParams,applicationContext,this)
             mqttManager?.connect()
-
 
         }else{
 
@@ -113,9 +116,6 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
     }
 
-    fun subscribe(topic:String){
-        mqttManager?.subscribe(topic)
-    }
 
 }
 

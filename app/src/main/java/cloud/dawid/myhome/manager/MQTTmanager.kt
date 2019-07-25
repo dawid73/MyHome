@@ -16,64 +16,70 @@ import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 import java.util.*
 
-class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Context, val uiUpdater: UIUpdaterInterface?) {
+class MQTTmanager(
+    val connectionParams: MQTTConnectionParams,
+    val context: Context,
+    val uiUpdater: UIUpdaterInterface?
+) {
 
-    private var client = MqttAndroidClient(context,connectionParams.host,connectionParams.clientId + id(context))
-    private var uniqueID:String? = null
+    private var client = MqttAndroidClient(context, connectionParams.host, connectionParams.clientId + id(context))
+    private var uniqueID: String? = null
     private val PREF_UNIQUE_ID = "PREF_UNIQUE_ID"
 
     init {
 
-        client.setCallback(object: MqttCallbackExtended {
-            override fun connectComplete(b:Boolean, s:String) {
+        client.setCallback(object : MqttCallbackExtended {
+            override fun connectComplete(b: Boolean, s: String) {
                 Log.w("mqtt", s)
                 uiUpdater?.resetUIWithConnection(true)
             }
-            override fun connectionLost(throwable:Throwable) {
+
+            override fun connectionLost(throwable: Throwable) {
                 uiUpdater?.resetUIWithConnection(false)
             }
-            override fun messageArrived(topic:String, mqttMessage: MqttMessage) {
+
+            override fun messageArrived(topic: String, mqttMessage: MqttMessage) {
                 Log.w("Mqtt", mqttMessage.toString())
                 uiUpdater?.update(mqttMessage.toString())
             }
+
             override fun deliveryComplete(iMqttDeliveryToken: IMqttDeliveryToken) {
             }
         })
     }
 
-    fun connect(){
+    fun connect() {
         val mqttConnectOptions = MqttConnectOptions()
         mqttConnectOptions.setAutomaticReconnect(true)
         mqttConnectOptions.setCleanSession(false)
         //mqttConnectOptions.setUserName(this.connectionParams.username)
         //mqttConnectOptions.setPassword(this.connectionParams.password.toCharArray())
-        try
-        {
+        try {
             var params = this.connectionParams
-            client.connect(mqttConnectOptions, null, object: IMqttActionListener {
-                override fun onSuccess(asyncActionToken:IMqttToken) {
+            client.connect(mqttConnectOptions, null, object : IMqttActionListener {
+                override fun onSuccess(asyncActionToken: IMqttToken) {
                     val disconnectedBufferOptions = DisconnectedBufferOptions()
                     disconnectedBufferOptions.setBufferEnabled(true)
                     disconnectedBufferOptions.setBufferSize(100)
                     disconnectedBufferOptions.setPersistBuffer(false)
                     disconnectedBufferOptions.setDeleteOldestMessages(false)
                     client.setBufferOpts(disconnectedBufferOptions)
-                    subscribe("test3")
+                    //subscribe("test2")
 
                 }
-                override fun onFailure(asyncActionToken:IMqttToken, exception:Throwable) {
+
+                override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
                     Log.w("Mqtt", "Failed to connect to: " + params.host + exception.toString())
                 }
             })
-        }
-        catch (ex:MqttException) {
+        } catch (ex: MqttException) {
             ex.printStackTrace()
         }
     }
 
-    fun disconnect(){
+    fun disconnect() {
         try {
-            client.disconnect(null,object :IMqttActionListener{
+            client.disconnect(null, object : IMqttActionListener {
                 /**
                  * This method is invoked when an action has completed successfully.
                  * @param asyncActionToken associated with the action that has completed
@@ -96,41 +102,38 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
                 }
 
             })
-        }
-        catch (ex:MqttException) {
+        } catch (ex: MqttException) {
             System.err.println("Exception disconnect")
             ex.printStackTrace()
         }
     }
 
     // Subscribe to topic
-    fun subscribe(topic: String){
-        try
-        {
-            client.subscribe(topic, 0, null, object:IMqttActionListener {
-                override fun onSuccess(asyncActionToken:IMqttToken) {
+    fun subscribe(topic: String) {
+        try {
+            client.subscribe(topic, 0, null, object : IMqttActionListener {
+                override fun onSuccess(asyncActionToken: IMqttToken) {
                     Log.w("Mqtt", "Subscription!")
                     Log.w("ODEBRANE:::::::: ", "NO I DZIALA")
                     //uiUpdater?.updateStatusViewWith("Subscribed to Topic")
                 }
-                override fun onFailure(asyncActionToken:IMqttToken, exception:Throwable) {
+
+                override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
                     Log.w("Mqtt", "Subscription fail!")
-                   // uiUpdater?.updateStatusViewWith("Falied to Subscribe to Topic")
+                    // uiUpdater?.updateStatusViewWith("Falied to Subscribe to Topic")
                 }
             })
-        }
-        catch (ex:MqttException) {
+        } catch (ex: MqttException) {
             System.err.println("Exception subscribing")
             ex.printStackTrace()
         }
     }
 
     // Unsubscribe the topic
-    fun unsubscribe(topic: String){
+    fun unsubscribe(topic: String) {
 
-        try
-        {
-            client.unsubscribe(topic,null,object :IMqttActionListener{
+        try {
+            client.unsubscribe(topic, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     uiUpdater?.updateStatusViewWith("UnSubscribed to Topic")
                 }
@@ -140,19 +143,17 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
                 }
 
             })
-        }
-        catch (ex:MqttException) {
+        } catch (ex: MqttException) {
             System.err.println("Exception unsubscribe")
             ex.printStackTrace()
         }
 
     }
 
-    fun publish(topic:String, message:String){
-        try
-        {
+    fun publish(topic: String, message: String) {
+        try {
 
-            client.publish(topic , message.toByteArray(),1,false,null,object :IMqttActionListener{
+            client.publish(topic, message.toByteArray(), 1, false, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     Log.w("Mqtt", "Publish Success!")
                     uiUpdater?.updateStatusViewWith("Published to Topic")
@@ -164,21 +165,20 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
                 }
 
             })
-        }
-        catch (ex:MqttException) {
+        } catch (ex: MqttException) {
             System.err.println("Exception publishing")
             ex.printStackTrace()
         }
     }
 
-    @Synchronized fun id(context:Context):String {
-        if (uniqueID == null)
-        {
+    @Synchronized
+    fun id(context: Context): String {
+        if (uniqueID == null) {
             val sharedPrefs = context.getSharedPreferences(
-                PREF_UNIQUE_ID, Context.MODE_PRIVATE)
+                PREF_UNIQUE_ID, Context.MODE_PRIVATE
+            )
             uniqueID = sharedPrefs.getString(PREF_UNIQUE_ID, null)
-            if (uniqueID == null)
-            {
+            if (uniqueID == null) {
                 uniqueID = UUID.randomUUID().toString()
                 val editor = sharedPrefs.edit()
                 editor.putString(PREF_UNIQUE_ID, uniqueID)
@@ -190,6 +190,12 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
 
 }
 
-data class MQTTConnectionParams(val clientId:String, val host: String, val topic: String, val username: String, val password: String){
+data class MQTTConnectionParams(
+    val clientId: String,
+    val host: String,
+    val topic: String,
+    val username: String,
+    val password: String
+) {
 
 }
