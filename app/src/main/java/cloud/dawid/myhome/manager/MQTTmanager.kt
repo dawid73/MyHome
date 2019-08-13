@@ -52,8 +52,11 @@ class MQTTmanager(
         val mqttConnectOptions = MqttConnectOptions()
         mqttConnectOptions.setAutomaticReconnect(true)
         mqttConnectOptions.setCleanSession(false)
-        //mqttConnectOptions.setUserName(this.connectionParams.username)
-        //mqttConnectOptions.setPassword(this.connectionParams.password.toCharArray())
+        mqttConnectOptions.setUserName(this.connectionParams.username)
+        mqttConnectOptions.setPassword(this.connectionParams.password.toCharArray())
+
+        val topic = this.connectionParams.topic
+
         try {
             var params = this.connectionParams
             client.connect(mqttConnectOptions, null, object : IMqttActionListener {
@@ -64,7 +67,7 @@ class MQTTmanager(
                     disconnectedBufferOptions.setPersistBuffer(false)
                     disconnectedBufferOptions.setDeleteOldestMessages(false)
                     client.setBufferOpts(disconnectedBufferOptions)
-                    //subscribe("test2")
+                    subscribe(topic)
 
                 }
 
