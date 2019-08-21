@@ -1,4 +1,4 @@
-package cloud.dawid.myhome
+package cloud.dawid .myhome
 
 
 import android.app.Notification
@@ -20,8 +20,15 @@ import cloud.dawid.myhome.fragments.AdvancedFragment
 import cloud.dawid.myhome.manager.MQTTConnectionParams
 import cloud.dawid.myhome.manager.MQTTmanager
 import cloud.dawid.myhome.manager.SharedPreference
+import cloud.dawid.myhome.models.DomoticzOswDevices
 import cloud.dawid.myhome.protocols.UIUpdaterInterface
 import kotlinx.android.synthetic.main.activity_main.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(), UIUpdaterInterface {
@@ -52,6 +59,9 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        getDataFromAPI()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -179,6 +189,62 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
     }
 
+//    Odbieranie danych z API
+    internal fun getDataFromAPI(){
+
+    val retrofit = Retrofit.Builder()
+        .baseUrl(BaseUrl)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    val service = retrofit.create(JsonApiService::class.java)
+
+    val call = service.getActualDataFromDevice(login, password, type)
+
+    call.enqueue(object : Callback<DomoticzOswDevices>{
+        override fun onResponse(call: Call<DomoticzOswDevices>, response: Response<DomoticzOswDevices>?) {
+            if(response!!.code() == 200){
+                var domoticzResponse = response.body()
+
+                var oneDevice = domoticzResponse.result
+
+                var length = oneDevice?.size
+
+                var test = ""
+
+                for (i in 0 until length!!){
+                    if (oneDevice != null) {
+                        test = test + oneDevice.get(i).data
+                    }
+                }
+
+                var stringBuilder = oneDevice?.get(1)?.data
+
+                Log.w("STRINGBUILDER index 1", test)
+
+                texttest.text = test
+            }
+
+        }
+        override fun onFailure(call: Call<DomoticzOswDevices>?, t: Throwable?) {
+                Log.w("jakas dupa nie poszło", t.toString())
+        }
+    })
+
+    }
+
+
+    companion object {
+
+        var BaseUrl = "http://188.117.181.24:4444/"
+        var login = "Y3p1am5paw=="
+        var password = "T3N3aWVjaW0zMjYwMA=="
+        var type = "devices"
+    }
+
 }
+
+
+
 
 
