@@ -16,11 +16,13 @@ import android.support.v4.app.NotificationManagerCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.RemoteViews
+import cloud.dawid.myhome.data.DeviceList
+import cloud.dawid.myhome.data.DomoticzOswService
 import cloud.dawid.myhome.fragments.AdvancedFragment
 import cloud.dawid.myhome.manager.MQTTConnectionParams
 import cloud.dawid.myhome.manager.MQTTmanager
 import cloud.dawid.myhome.manager.SharedPreference
-import cloud.dawid.myhome.models.DomoticzOswDevices
+
 import cloud.dawid.myhome.protocols.UIUpdaterInterface
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
@@ -60,7 +62,8 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        getDataFromAPI()
+
+        showParameterFromDevice()
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -116,6 +119,7 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         btn_alarm.setOnClickListener {
             sendMessage("alarmactivate", "0")
             shownotification("zalaczam alarm")
+            showParameterFromDevice()
         }
 
 
@@ -124,6 +128,45 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         startService(intenetSevice)
 
        // subscribeTopic("komunikat13")
+    }
+
+    private fun showParameterFromDevice() {
+
+        val BASE_URL = "http://188.117.181.24:4444"
+
+        val retrofit: Retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val service = retrofit.create(DomoticzOswService::class.java)
+        val call = service.getDevicesData()
+
+        call.enqueue(object : Callback<DeviceList>{
+            override fun onFailure(call: Call<DeviceList>, t: Throwable) {
+                Log.w("jakis problem", t.toString())
+            }
+
+            override fun onResponse(call: Call<DeviceList>, response: Response<DeviceList>) {
+                if(response.code() == 200){
+                    val devicesResponse = response.body()
+
+                    val device = devicesResponse?.devices?.get(0)?.LastUpdate
+
+                    val sloncewstalo = devicesResponse?.Sunrise
+                    val sloncezasnie = devicesResponse?.Sunset
+
+                    texttest.text = device
+
+
+                    Log.i(">>>>>>>>> wschod: ", sloncewstalo)
+                    Log.i(">>>>>>>>> zachod: ", sloncezasnie)
+                }
+            }
+
+        })
+
+
     }
 
 
@@ -189,49 +232,7 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
     }
 
-//    Odbieranie danych z API
-    internal fun getDataFromAPI(){
 
-    val retrofit = Retrofit.Builder()
-        .baseUrl(BaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    val service = retrofit.create(JsonApiService::class.java)
-
-    val call = service.getActualDataFromDevice(login, password, type)
-
-    call.enqueue(object : Callback<DomoticzOswDevices>{
-        override fun onResponse(call: Call<DomoticzOswDevices>, response: Response<DomoticzOswDevices>?) {
-            if(response!!.code() == 200){
-                var domoticzResponse = response.body()
-
-                var oneDevice = domoticzResponse.result
-
-                var length = oneDevice?.size
-
-                var test = ""
-
-                for (i in 0 until length!!){
-                    if (oneDevice != null) {
-                        test = test + oneDevice.get(i).data
-                    }
-                }
-
-                var stringBuilder = oneDevice?.get(1)?.data
-
-                Log.w("STRINGBUILDER index 1", test)
-
-                texttest.text = test
-            }
-
-        }
-        override fun onFailure(call: Call<DomoticzOswDevices>?, t: Throwable?) {
-                Log.w("jakas dupa nie poszło", t.toString())
-        }
-    })
-
-    }
 
 
     companion object {
