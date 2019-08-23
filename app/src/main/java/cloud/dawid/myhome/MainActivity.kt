@@ -7,6 +7,9 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.AssetManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -16,8 +19,6 @@ import android.support.v4.app.NotificationManagerCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.RemoteViews
-import cloud.dawid.myhome.data.DeviceList
-import cloud.dawid.myhome.data.DomoticzOswService
 import cloud.dawid.myhome.fragments.AdvancedFragment
 import cloud.dawid.myhome.manager.MQTTConnectionParams
 import cloud.dawid.myhome.manager.MQTTmanager
@@ -30,9 +31,15 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import android.support.v4.app.SupportActivity
+import android.support.v4.app.SupportActivity.ExtraData
+import android.support.v4.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import cloud.dawid.myhome.data.*
+import java.io.IOException
+import java.io.InputStream
 
 
-@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
 
@@ -63,7 +70,8 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
     override fun onCreate(savedInstanceState: Bundle?) {
 
 
-        showParameterFromDevice()
+        showDataFromDomoticzOswiecim()
+        showWeatherFromOpenweathermap()
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -119,7 +127,6 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         btn_alarm.setOnClickListener {
             sendMessage("alarmactivate", "0")
             shownotification("zalaczam alarm")
-            showParameterFromDevice()
         }
 
 
@@ -130,44 +137,7 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
        // subscribeTopic("komunikat13")
     }
 
-    private fun showParameterFromDevice() {
 
-        val BASE_URL = "http://188.117.181.24:4444"
-
-        val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val service = retrofit.create(DomoticzOswService::class.java)
-        val call = service.getDevicesData()
-
-        call.enqueue(object : Callback<DeviceList>{
-            override fun onFailure(call: Call<DeviceList>, t: Throwable) {
-                Log.w("jakis problem", t.toString())
-            }
-
-            override fun onResponse(call: Call<DeviceList>, response: Response<DeviceList>) {
-                if(response.code() == 200){
-                    val devicesResponse = response.body()
-
-                    val device = devicesResponse?.devices?.get(0)?.LastUpdate
-
-                    val sloncewstalo = devicesResponse?.Sunrise
-                    val sloncezasnie = devicesResponse?.Sunset
-
-                    texttest.text = device
-
-
-                    Log.i(">>>>>>>>> wschod: ", sloncewstalo)
-                    Log.i(">>>>>>>>> zachod: ", sloncezasnie)
-                }
-            }
-
-        })
-
-
-    }
 
 
     fun connect(adress:String){
@@ -234,6 +204,111 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
 
 
+    private fun showDataFromDomoticzOswiecim() {
+
+        val FUNNAME = "showDataFromDomoticzOs"
+
+        val retrofit: Retrofit = Retrofit.Builder()
+            .baseUrl(DomoticzOswUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val service = retrofit.create(DomoticzOswService::class.java)
+        val call = service.getDevicesData()
+
+        call.enqueue(object : Callback<DeviceList>{
+            override fun onFailure(call: Call<DeviceList>, t: Throwable) {
+                Log.e(FUNNAME, t.toString())
+            }
+
+            override fun onResponse(call: Call<DeviceList>, response: Response<DeviceList>) {
+                if(response.code() == 200){
+                    val devicesResponse = response.body()
+
+                    val lastupdate = devicesResponse?.devices?.get(0)?.LastUpdate
+
+                    val sunrise = devicesResponse?.Sunrise
+                    val sunset = devicesResponse?.Sunset
+
+                    val tempdata = devicesResponse?.devices?.get(0)?.Data
+
+//                    ustawienie wyników w widoku:
+                    textTempOswiecim.text = tempdata
+                    textTempOswLastUpdate.text = lastupdate
+
+                }
+            }
+
+        })
+
+
+    }
+
+
+    private fun showWeatherFromOpenweathermap(){
+
+        val FUNNAME = "showWeatherFromO"
+
+        val retrofit: Retrofit = Retrofit.Builder()
+            .baseUrl(OpenweathermapUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val service = retrofit.create(OpenweathermapService::class.java)
+        val call = service.getDataFromOpenweathermap()
+
+        call.enqueue(object : Callback<WeatherDataList>{
+            override fun onFailure(call: Call<WeatherDataList>, t: Throwable) {
+                Log.e(FUNNAME, t.toString())
+            }
+
+            override fun onResponse(
+                call: Call<WeatherDataList>,
+                response: Response<WeatherDataList>
+            ) {
+                val weatherDatas = response.body()
+
+                val weatherIcon = weatherDatas?.weather?.get(0)?.icon
+
+                val iconFileName = "ico"+weatherIcon+".png"
+
+                iconWeatherOswiecim.setImageBitmap(getBitmapFromAssets(iconFileName))
+            }
+
+        })
+    }
+
+    private fun showForecastFromOpen(){
+        val FUNNAME = "showForecastFromOpen"
+
+        val retrofit: Retrofit = Retrofit.Builder()
+            .baseUrl(OpenweathermapUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val service = retrofit.create(OpenweathermapService::class.java)
+        val call = service.getForecastFromOpenweathermap()
+
+        call.enqueue(object : Callback<WeatherForecastList>{
+            override fun onFailure(call: Call<WeatherForecastList>, t: Throwable) {
+                Log.e(FUNNAME, t.toString())
+            }
+
+            override fun onResponse(
+                call: Call<WeatherForecastList>,
+                response: Response<WeatherForecastList>
+            ) {
+                val weatherDatas = response.body()
+
+                //TODO tutaj dopisz kod który pokazuje prognozę pogody
+            }
+
+        })
+
+    }
+
+
+
 
     companion object {
 
@@ -241,6 +316,20 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         var login = "Y3p1am5paw=="
         var password = "T3N3aWVjaW0zMjYwMA=="
         var type = "devices"
+        var DomoticzOswUrl = "http://188.117.181.24:4444"
+        var OpenweathermapUrl = "http://api.openweathermap.org/data/2.5/"
+    }
+
+    private fun getBitmapFromAssets(fileName: String): Bitmap {
+        val assetManager = assets
+        var inputStream: InputStream? = null
+        try {
+            inputStream = assetManager.open("images/$fileName")
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        return BitmapFactory.decodeStream(inputStream)
     }
 
 }
