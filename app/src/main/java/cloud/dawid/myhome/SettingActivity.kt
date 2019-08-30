@@ -17,16 +17,12 @@ class SettingActivity : AppCompatActivity() {
 
         val sharedPreference = SharedPreference(this)
 
-       // sharedPreference.save("advanced", true)
 
+        if(sharedPreference.getValueString("adresMQTT")!=null){
 
-        if(sharedPreference.getValueString("adres")!=null){
-
-            var temp = sharedPreference.getValueString("adres")
-
-            Log.d("ADRESS TUTAJ: ", temp)
-
-            adress_properties.setText(temp)
+            adress_properties.setText(sharedPreference.getValueString("adresMQTT"))
+            user_properties.setText(sharedPreference.getValueString("usernameMQTT"))
+            password_properties.setText(sharedPreference.getValueString("passwordMQTT"))
 
             switchadvaced.isChecked = sharedPreference.getValueBoolean("advanced")!!
         }
@@ -34,14 +30,18 @@ class SettingActivity : AppCompatActivity() {
 
 
         btn_sava.setOnClickListener{
-            val adresString = adress_properties.editableText.toString()
+            var adresMQTTString = adress_properties.editableText.toString()
+            var usernameMQTTString = user_properties.editableText.toString()
+            var passwordMQTTString = password_properties.editableText.toString()
 
             var isAdwance = switchadvaced.isChecked
 
             Toast.makeText(this@SettingActivity, isAdwance.toString(), Toast.LENGTH_SHORT).show()
 
             sharedPreference.save("advanced", isAdwance)
-            sharedPreference.save("adres", adresString)
+            sharedPreference.save("adresMQTT", adresMQTTString)
+            sharedPreference.save("usernameMQTT", usernameMQTTString)
+            sharedPreference.save("passwordMQTT", passwordMQTTString)
 
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)

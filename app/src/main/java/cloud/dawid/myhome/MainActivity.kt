@@ -51,42 +51,51 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
     private val channelID = "cloud.dawid.myhome"
     private val description = "MyHome notification"
 
+    //zmienne pobierane z SharedPreferences
+    var isAdvanced: Boolean = false
+    lateinit var adressMQTT: String
+    lateinit var usernameMQTT: String
+    lateinit var passwordMQTT: String
+    lateinit var adressDomoticzOsw: String
+    lateinit var usernameDomOsw: String
+    lateinit var passwordDomOsw: String
+
 
     override fun resetUIWithConnection(status: Boolean) {
-
     }
 
     override fun updateStatusViewWith(status: String) {
-
     }
 
     override fun update(message: String){
-
         shownotification(message)
-
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
-        showDataFromDomoticzOswiecim()
-        showWeatherFromOpenweathermap()
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //tworze obiekt notificationmananger na potrzeby notyfikacji
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
+
+        //ustawienie zmienny z sharedpreferences
+        setVarFromSharedPreferences()
+
+        //ustawia temperature na podstawie danych API z domoticz
+        showDataFromDomoticzOswiecim()
+
+        //pokazuje pogode (ikone) na podstawie danych z Openweathermaps API
+        showWeatherFromOpenweathermap()
+
+
+        //laczenie z MQTT
+        connect(adressMQTT, usernameMQTT, passwordMQTT)
+
+        //fragment menager (WOL komputera)
         val fm:FragmentManager = supportFragmentManager
         val advancedFragment = AdvancedFragment()
-
-        val sharedPreference = SharedPreference(this)
-
-        var isAdvanced = sharedPreference.getValueBoolean("advanced")
-        var adress = sharedPreference.getValueString("adres")
-
-        connect(adress.toString())
 
         // fragment z przyciskami WOL do komputerów. Sprawdza czy jest ustawiona true w zmiennej isAdvanced
         if(isAdvanced!!) {
@@ -125,8 +134,9 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         }
 
         btn_alarm.setOnClickListener {
-            sendMessage("alarmactivate", "0")
+            //sendMessage("alarmactivate", "0")
             shownotification("zalaczam alarm")
+            showWeatherFromOpenweathermap()
         }
 
 
@@ -138,15 +148,28 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
     }
 
 
+    fun setVarFromSharedPreferences(){
+        val sharedPreference = SharedPreference(this)
+
+        isAdvanced = sharedPreference.getValueBoolean("advanced")!!
+        adressMQTT = sharedPreference.getValueString("adresMQTT").toString()
+        usernameMQTT = sharedPreference.getValueString("usernameMQTT").toString()
+        passwordMQTT = sharedPreference.getValueString("passwordMQTT").toString()
 
 
-    fun connect(adress:String){
+
+    }
+
+
+
+
+    fun connect(adress:String, username:String, password:String){
 
         if (true) {
 
             var host = "tcp://" + adress + ":1883"
             var topic = "komunikat11"
-            var connectionParams = MQTTConnectionParams("MQTTSample",host,topic,"myhome","Oswiecim")
+            var connectionParams = MQTTConnectionParams("MQTTSample",host,topic,username,password)
             mqttManager = MQTTmanager(connectionParams,applicationContext,this)
             mqttManager.connect()
 
@@ -254,18 +277,21 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        val service = retrofit.create(OpenweathermapService::class.java)
-        val call = service.getDataFromOpenweathermap()
+        val serviceOW = retrofit.create(OpenweathermapService::class.java)
+        val callOW = serviceOW.getDataFromOpenweathermap()
 
-        call.enqueue(object : Callback<WeatherDataList>{
+
+        callOW.enqueue(object : Callback<WeatherDataList>{
             override fun onFailure(call: Call<WeatherDataList>, t: Throwable) {
                 Log.e(FUNNAME, t.toString())
+                Log.e(FUNNAME, "jakas dupa")
             }
 
             override fun onResponse(
                 call: Call<WeatherDataList>,
                 response: Response<WeatherDataList>
             ) {
+
                 val weatherDatas = response.body()
 
                 val weatherIcon = weatherDatas?.weather?.get(0)?.icon
@@ -273,6 +299,8 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
                 val iconFileName = "ico"+weatherIcon+".png"
 
                 iconWeatherOswiecim.setImageBitmap(getBitmapFromAssets(iconFileName))
+
+                testopen.text = iconFileName
             }
 
         })
