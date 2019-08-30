@@ -2,9 +2,11 @@ package cloud.dawid.myhome.data
 
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface DomoticzOswService {
-    @GET("json.htm?username=Y3p1am5paw==&password=T3N3aWVjaW0zMjYwMA==&type=devices")
-    fun getDevicesData(): Call<DeviceList>
+    @GET("json.htm?")
+    fun getDevicesData(@Query("username") username: String, @Query("password") password: String, @Query("type") type: String): Call<DeviceList>
 
 }
+

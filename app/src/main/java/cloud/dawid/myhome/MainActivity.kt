@@ -35,6 +35,7 @@ import android.support.v4.app.SupportActivity
 import android.support.v4.app.SupportActivity.ExtraData
 import android.support.v4.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.util.Base64
 import cloud.dawid.myhome.data.*
 import java.io.IOException
 import java.io.InputStream
@@ -56,9 +57,13 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
     lateinit var adressMQTT: String
     lateinit var usernameMQTT: String
     lateinit var passwordMQTT: String
-    lateinit var adressDomoticzOsw: String
-    lateinit var usernameDomOsw: String
-    lateinit var passwordDomOsw: String
+
+    lateinit var domoticzOswUrl: String
+    lateinit var domoticzOswLogin: String
+    lateinit var domoticzOswPassword: String
+    var type = "devices"
+
+    var OpenweathermapUrl = "http://37.139.1.159/data/2.5/"
 
 
     override fun resetUIWithConnection(status: Boolean) {
@@ -91,7 +96,7 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
 
         //laczenie z MQTT
-        connect(adressMQTT, usernameMQTT, passwordMQTT)
+        connectMQTT(adressMQTT, usernameMQTT, passwordMQTT)
 
         //fragment menager (WOL komputera)
         val fm:FragmentManager = supportFragmentManager
@@ -136,7 +141,6 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         btn_alarm.setOnClickListener {
             //sendMessage("alarmactivate", "0")
             shownotification("zalaczam alarm")
-            showWeatherFromOpenweathermap()
         }
 
 
@@ -151,34 +155,66 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
     fun setVarFromSharedPreferences(){
         val sharedPreference = SharedPreference(this)
 
+        //MQTT
         isAdvanced = sharedPreference.getValueBoolean("advanced")!!
         adressMQTT = sharedPreference.getValueString("adresMQTT").toString()
         usernameMQTT = sharedPreference.getValueString("usernameMQTT").toString()
         passwordMQTT = sharedPreference.getValueString("passwordMQTT").toString()
 
+        if(adressMQTT==""){
+            adressMQTT = "http://127.0.0.1:1234"
+            error_on_top.text = "Uzupelnij dane logowania do MQTT"
+        }
+        if(usernameMQTT==""){
+            usernameMQTT = "error"
+            error_on_top.text = "Uzupelnij dane logowania do MQTT"
+        }
+        if(passwordMQTT==""){
+            passwordMQTT = "error"
+            error_on_top.text = "Uzupelnij dane logowania do MQTT"
+        }
 
+
+//        //DOMOTICZ
+        var serverAdresDomoticz = sharedPreference.getValueBoolean("domitczSerwer").toString()
+        var serverPortDomoticz = sharedPreference.getValueBoolean("domoticzPortString").toString()
+
+        if(serverAdresDomoticz=="" || serverAdresDomoticz == "false"){
+            serverAdresDomoticz = "127.0.0.1"
+            error_on_top.text = "Uzupelnij dane logowania do Domoticza"
+        }
+        if(serverPortDomoticz=="" || serverPortDomoticz == "false"){
+            serverPortDomoticz = "1111"
+            error_on_top.text = "Uzupelnij dane logowania do Domoticza"
+        }
+
+        domoticzOswUrl = "http://" + serverAdresDomoticz + ":" + serverPortDomoticz
+        domoticzOswLogin = sharedPreference.getValueBoolean("domoticzUsername").toString()
+        domoticzOswPassword = sharedPreference.getValueBoolean("domoticzPassword").toString()
+
+        if(domoticzOswLogin==""){
+            domoticzOswLogin = "brak"
+            error_on_top.text = "Uzupelnij dane logowania do Domoticza"
+        }
+        if(domoticzOswPassword==""){
+            domoticzOswPassword = "brak"
+            error_on_top.text = "Uzupelnij dane logowania do Domoticza"
+        }
+
+//        domoticzOswUrl = "http://188.117.181.24:4444"
+//        domoticzOswLogin = "YXBp"
+//        domoticzOswPassword = "b3N3"
 
     }
 
 
+    fun connectMQTT(adress:String, username:String, password:String){
 
-
-    fun connect(adress:String, username:String, password:String){
-
-        if (true) {
-
-            var host = "tcp://" + adress + ":1883"
-            var topic = "komunikat11"
-            var connectionParams = MQTTConnectionParams("MQTTSample",host,topic,username,password)
-            mqttManager = MQTTmanager(connectionParams,applicationContext,this)
-            mqttManager.connect()
-
-        }else{
-
-            updateStatusViewWith("Please enter all valid fields")
-
-        }
-
+        var host = "tcp://" + adress + ":1883"
+        var topic = "komunikacja"
+        var connectionParams = MQTTConnectionParams("MQTTAndroid",host,topic,username,password)
+        mqttManager = MQTTmanager(connectionParams,applicationContext,this)
+        mqttManager.connect()
     }
 
 
@@ -232,12 +268,12 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         val FUNNAME = "showDataFromDomoticzOs"
 
         val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl(DomoticzOswUrl)
+            .baseUrl(domoticzOswUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val service = retrofit.create(DomoticzOswService::class.java)
-        val call = service.getDevicesData()
+        val call = service.getDevicesData(domoticzOswLogin, domoticzOswPassword, type)
 
         call.enqueue(object : Callback<DeviceList>{
             override fun onFailure(call: Call<DeviceList>, t: Throwable) {
@@ -299,8 +335,6 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
                 val iconFileName = "ico"+weatherIcon+".png"
 
                 iconWeatherOswiecim.setImageBitmap(getBitmapFromAssets(iconFileName))
-
-                testopen.text = iconFileName
             }
 
         })
@@ -340,13 +374,11 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
     companion object {
 
-        var BaseUrl = "http://188.117.181.24:4444/"
-        var login = "Y3p1am5paw=="
-        var password = "T3N3aWVjaW0zMjYwMA=="
-        var type = "devices"
-        var DomoticzOswUrl = "http://188.117.181.24:4444"
-        var OpenweathermapUrl = "http://api.openweathermap.org/data/2.5/"
+
+
+
     }
+
 
     private fun getBitmapFromAssets(fileName: String): Bitmap {
         val assetManager = assets

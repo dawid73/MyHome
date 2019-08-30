@@ -68,7 +68,6 @@ class MQTTmanager(
                     disconnectedBufferOptions.setDeleteOldestMessages(false)
                     client.setBufferOpts(disconnectedBufferOptions)
                     subscribe(topic)
-
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
