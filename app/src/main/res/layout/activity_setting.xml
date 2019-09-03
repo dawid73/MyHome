@@ -12,46 +12,70 @@
 
 
     <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Ustawienia"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:textSize="18sp"
-        />
-
-    <LinearLayout
-            android:paddingTop="30dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Ustawienia"
+            android:textColor="#3F51B5"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+    <View
+            android:id="@+id/divider1"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="?android:attr/listDivider" />
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="MQTT Server"
+            android:textColor="#3F51B5"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
             android:orientation="horizontal"
-    >
+            android:paddingTop="5dp">
+
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Adres serwera"
+                android:layout_weight="2"
                 android:gravity="right"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_weight="1"
-        />
+                android:text="Adres serwera"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
         <EditText
+                android:id="@+id/adress_properties"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:inputType="textPersonName"
                 android:text=""
-                android:layout_weight="1"
-                android:id="@+id/adress_properties"
+                android:textSize="11sp"
 
-        />
+                />
 
     </LinearLayout>
 
     <LinearLayout
-            android:paddingTop="30dp"
+            android:paddingTop="5dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="38dp"
             android:orientation="horizontal"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
     >
         <TextView
                 android:layout_width="match_parent"
@@ -59,8 +83,8 @@
                 android:text="Użytkownik"
                 android:gravity="right"
                 android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_weight="1"
+                android:textSize="10sp"
+                android:layout_weight="2"
         />
         <EditText
                 android:layout_width="match_parent"
@@ -70,15 +94,18 @@
                 android:ems="13"
                 android:layout_weight="1"
                 android:id="@+id/user_properties"
-                android:autofillHints=""/>
+                android:autofillHints=""
+                android:textSize="11sp"/>
 
     </LinearLayout>
 
     <LinearLayout
-            android:paddingTop="30dp"
+            android:paddingTop="5dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="38dp"
             android:orientation="horizontal"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
     >
         <TextView
                 android:layout_width="match_parent"
@@ -86,8 +113,8 @@
                 android:text="Hasło"
                 android:gravity="right"
                 android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_weight="1"
+                android:textSize="10sp"
+                android:layout_weight="2"
         />
         <EditText
                 android:layout_width="match_parent"
@@ -97,21 +124,188 @@
                 android:text=""
                 android:ems="13"
                 android:id="@+id/password_properties"
+                android:textSize="11sp"
         />
 
 
 
     </LinearLayout>
 
-    <Switch
-            android:text="Zaawansowane"
+    <LinearLayout
+            android:paddingTop="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
-            android:layout_marginTop="30dp"
-            android:id="@+id/switchadvaced"
-    />
+            >
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Zaawansowane"
+                android:gravity="right"
+                android:textStyle="bold"
+                android:textSize="10sp"
+                android:layout_weight="2"
+                />
+
+        <Switch
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/switchadvaced"
+                android:layout_weight="1"
+                />
+
+    </LinearLayout>
+
+    <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="?android:attr/listDivider" />
+
+
+<!--    dane domoticz start-->
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Domoticz"
+            android:textColor="#3F51B5"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+
+    <LinearLayout
+            android:paddingTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:orientation="horizontal"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            >
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Adres serwera"
+                android:gravity="right"
+                android:textStyle="bold"
+                android:textSize="10sp"
+                android:layout_weight="2"
+                />
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:text=""
+                android:layout_weight="1"
+                android:id="@+id/domitczSerwer"
+                android:textSize="11sp"
+
+                />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:paddingTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:orientation="horizontal"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            >
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Port serwera"
+                android:gravity="right"
+                android:textStyle="bold"
+                android:textSize="10sp"
+                android:layout_weight="2"
+                />
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text=""
+                android:layout_weight="1"
+                android:id="@+id/domitczPort"
+                android:textSize="11sp"
+                />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:paddingTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:orientation="horizontal"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            >
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Użytkownik"
+                android:gravity="right"
+                android:textStyle="bold"
+                android:textSize="10sp"
+                android:layout_weight="2"
+                />
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:text=""
+                android:ems="13"
+                android:layout_weight="1"
+                android:id="@+id/domoticzUsername"
+                android:autofillHints=""
+                android:textSize="11sp"
+                />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:paddingTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:orientation="horizontal"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            >
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hasło"
+                android:gravity="right"
+                android:textStyle="bold"
+                android:textSize="10sp"
+                android:layout_weight="2"
+                />
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:layout_weight="1"
+                android:text=""
+                android:ems="13"
+                android:id="@+id/domoticzPassword"
+                android:textSize="11sp"
+                />
+
+
+
+    </LinearLayout>
+
+<!--    dane domoticz stop-->
+
+
 
 
     <LinearLayout
@@ -123,9 +317,10 @@
         <Button
                 android:layout_width="wrap_content"
                 android:text="ZAPISZ"
-                android:id="@+id/btn_sava"
+                android:id="@+id/btn_save"
                 android:gravity="center"
                 android:layout_height="wrap_content"/>
+
 
     </LinearLayout>
 

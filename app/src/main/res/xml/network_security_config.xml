@@ -3,5 +3,6 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">188.117.181.24</domain>
         <domain includeSubdomains="true">api.openweathermap.org</domain>
+        <domain includeSubdomains="true">37.139.1.159</domain>
     </domain-config>
 </network-security-config>

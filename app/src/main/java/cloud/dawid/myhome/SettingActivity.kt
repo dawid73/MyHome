@@ -17,34 +17,48 @@ class SettingActivity : AppCompatActivity() {
 
         val sharedPreference = SharedPreference(this)
 
-       // sharedPreference.save("advanced", true)
+        // USTAWIENIE AKTUALNYCH USTAWIEN:
+
+        //MQTT Server
+        adress_properties.setText(sharedPreference.getValueString("adresMQTT"))
+        user_properties.setText(sharedPreference.getValueString("usernameMQTT"))
+        password_properties.setText(sharedPreference.getValueString("passwordMQTT"))
+        switchadvaced.isChecked = sharedPreference.getValueBoolean("advanced")!!
+
+        //domoticz Server
+        domitczSerwer.setText(sharedPreference.getValueString("domoticzSerwer"))
+        domitczPort.setText(sharedPreference.getValueString("domoticzPort"))
+        domoticzUsername.setText(sharedPreference.getValueString("domoticzUsername"))
+        domoticzPassword.setText(sharedPreference.getValueString("domoticzPassword"))
 
 
-        if(sharedPreference.getValueString("adres")!=null){
 
-            var temp = sharedPreference.getValueString("adres")
+        btn_save.setOnClickListener{
 
-            Log.d("ADRESS TUTAJ: ", temp)
-
-            adress_properties.setText(temp)
-
-            switchadvaced.isChecked = sharedPreference.getValueBoolean("advanced")!!
-        }
-
-
-
-        btn_sava.setOnClickListener{
-            val adresString = adress_properties.editableText.toString()
-
+            var adresMQTTString = adress_properties.editableText.toString()
+            var usernameMQTTString = user_properties.editableText.toString()
+            var passwordMQTTString = password_properties.editableText.toString()
             var isAdwance = switchadvaced.isChecked
 
-            Toast.makeText(this@SettingActivity, isAdwance.toString(), Toast.LENGTH_SHORT).show()
+            var domitczSerwerString = domitczSerwer.editableText.toString()
+            var domoticzPortString = domitczPort.editableText.toString()
+            var domoticzUsernameString = domoticzUsername.editableText.toString()
+            var domoticzPasswordString = domoticzPassword.editableText.toString()
 
             sharedPreference.save("advanced", isAdwance)
-            sharedPreference.save("adres", adresString)
+            sharedPreference.save("adresMQTT", adresMQTTString)
+            sharedPreference.save("usernameMQTT", usernameMQTTString)
+            sharedPreference.save("passwordMQTT", passwordMQTTString)
+
+            sharedPreference.save("domoticzSerwer", domitczSerwerString)
+            sharedPreference.save("domoticzPort", domoticzPortString)
+            sharedPreference.save("domoticzUsername", domoticzUsernameString)
+            sharedPreference.save("domoticzPassword", domoticzPasswordString)
 
             val intent = Intent(this, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
+            finish()
         }
 
 

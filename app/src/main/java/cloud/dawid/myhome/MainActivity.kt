@@ -35,6 +35,8 @@ import android.support.v4.app.SupportActivity
 import android.support.v4.app.SupportActivity.ExtraData
 import android.support.v4.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.util.Base64
+import android.widget.Toast
 import cloud.dawid.myhome.data.*
 import java.io.IOException
 import java.io.InputStream
@@ -51,42 +53,62 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
     private val channelID = "cloud.dawid.myhome"
     private val description = "MyHome notification"
 
+    //zmienne pobierane z SharedPreferences
+    var isAdvanced: Boolean = false
+    lateinit var adressMQTT: String
+    lateinit var usernameMQTT: String
+    lateinit var passwordMQTT: String
+
+    lateinit var domoticzOswUrl: String
+    lateinit var domoticzOswLogin: String
+    lateinit var domoticzOswPassword: String
+    var type = "devices"
+
+    var OpenweathermapUrl = "http://37.139.1.159/data/2.5/"
+
 
     override fun resetUIWithConnection(status: Boolean) {
-
     }
 
     override fun updateStatusViewWith(status: String) {
-
     }
 
     override fun update(message: String){
-
         shownotification(message)
-
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
-        showDataFromDomoticzOswiecim()
-        showWeatherFromOpenweathermap()
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //tworze obiekt notificationmananger na potrzeby notyfikacji
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
+
+        //ustawienie zmienny z sharedpreferences
+        setVarFromSharedPreferences()
+
+        //ustawia temperature na podstawie danych API z domoticz
+        showDataFromDomoticzOswiecim()
+
+        textTempOswiecim.setOnClickListener{
+            showDataFromDomoticzOswiecim()
+            showWeatherFromOpenweathermap()
+            Toast.makeText(this, "odswiezam dane", Toast.LENGTH_SHORT).show()
+        }
+
+
+        //pokazuje pogode (ikone) na podstawie danych z Openweathermaps API
+        showWeatherFromOpenweathermap()
+
+
+        //laczenie z MQTT
+        connectMQTT(adressMQTT, usernameMQTT, passwordMQTT)
+
+        //fragment menager (WOL komputera)
         val fm:FragmentManager = supportFragmentManager
         val advancedFragment = AdvancedFragment()
-
-        val sharedPreference = SharedPreference(this)
-
-        var isAdvanced = sharedPreference.getValueBoolean("advanced")
-        var adress = sharedPreference.getValueString("adres")
-
-        connect(adress.toString())
 
         // fragment z przyciskami WOL do komputerów. Sprawdza czy jest ustawiona true w zmiennej isAdvanced
         if(isAdvanced!!) {
@@ -103,30 +125,30 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 //        PRZYCISKI
 
         btnGoraON.setOnClickListener {
-            sendMessage("pin12", "1")
-            shownotification("światło góra - ON ")
+            sendMessage("pin12", "false")
+            //shownotification("światło góra - ON ")
         }
         btnGoraOFF.setOnClickListener {
-            sendMessage("pin12", "0")
-            shownotification("światło góra - OFF ")
+            sendMessage("pin12", "true")
+           // shownotification("światło góra - OFF ")
         }
         btnDolON.setOnClickListener {
-            sendMessage("pin11", "1")
-            shownotification("światło doł - ON ")
+            sendMessage("pin11", "false")
+            //shownotification("światło doł - ON ")
         }
         btnDolOFF.setOnClickListener {
-            sendMessage("pin11", "0")
-            shownotification("światło dol - OFF ")
+            sendMessage("pin11", "true")
+            //shownotification("światło dol - OFF ")
         }
 
         btn_drzwi.setOnClickListener {
             sendMessage("opendoorintercom", "0")
-            shownotification("otwieram dzwi")
+           // shownotification("otwieram dzwi")
         }
 
         btn_alarm.setOnClickListener {
             sendMessage("alarmactivate", "0")
-            shownotification("zalaczam alarm")
+            //shownotification("zalaczam alarm")
         }
 
 
@@ -138,24 +160,66 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
     }
 
 
+    fun setVarFromSharedPreferences(){
+        val sharedPreference = SharedPreference(this)
 
+        //MQTT
+        isAdvanced = sharedPreference.getValueBoolean("advanced")!!
+        adressMQTT = sharedPreference.getValueString("adresMQTT").toString()
+        usernameMQTT = sharedPreference.getValueString("usernameMQTT").toString()
+        passwordMQTT = sharedPreference.getValueString("passwordMQTT").toString()
 
-    fun connect(adress:String){
-
-        if (true) {
-
-            var host = "tcp://" + adress + ":1883"
-            var topic = "komunikat11"
-            var connectionParams = MQTTConnectionParams("MQTTSample",host,topic,"myhome","Oswiecim")
-            mqttManager = MQTTmanager(connectionParams,applicationContext,this)
-            mqttManager.connect()
-
-        }else{
-
-            updateStatusViewWith("Please enter all valid fields")
-
+        if(adressMQTT==""){
+            adressMQTT = "http://127.0.0.1:1234"
+            error_on_top.text = "Uzupelnij dane logowania do MQTT"
+        }
+        if(usernameMQTT==""){
+            usernameMQTT = "error"
+            error_on_top.text = "Uzupelnij dane logowania do MQTT"
+        }
+        if(passwordMQTT==""){
+            passwordMQTT = "error"
+            error_on_top.text = "Uzupelnij dane logowania do MQTT"
         }
 
+
+//        //DOMOTICZ
+        var serverAdresDomoticz = sharedPreference.getValueString("domoticzSerwer").toString()
+        var serverPortDomoticz = sharedPreference.getValueString("domoticzPort").toString()
+
+        if(serverAdresDomoticz=="" || serverAdresDomoticz=="null"){
+            serverAdresDomoticz = "127.0.0.1"
+            error_on_top.text = "Uzupelnij dane logowania do Domoticza"
+        }
+        if(serverPortDomoticz=="" || serverPortDomoticz=="null"){
+            serverPortDomoticz = "1111"
+            error_on_top.text = "Uzupelnij dane logowania do Domoticza"
+        }
+
+
+        domoticzOswUrl = "http://" + serverAdresDomoticz + ":" + serverPortDomoticz
+        domoticzOswLogin = sharedPreference.getValueString("domoticzUsername").toString()
+        domoticzOswPassword = sharedPreference.getValueString("domoticzPassword").toString()
+
+        if(domoticzOswLogin==""){
+            domoticzOswLogin = "brak"
+            error_on_top.text = "Uzupelnij dane logowania do Domoticza"
+        }
+        if(domoticzOswPassword==""){
+            domoticzOswPassword = "brak"
+            error_on_top.text = "Uzupelnij dane logowania do Domoticza"
+        }
+
+    }
+
+
+    fun connectMQTT(adress:String, username:String, password:String){
+
+        var host = "tcp://" + adress + ":1883"
+        var topic = "komunikacja"
+        var connectionParams = MQTTConnectionParams("MQTTAndroid",host,topic,username,password)
+        mqttManager = MQTTmanager(connectionParams,applicationContext,this)
+        mqttManager.connect()
     }
 
 
@@ -209,12 +273,12 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         val FUNNAME = "showDataFromDomoticzOs"
 
         val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl(DomoticzOswUrl)
+            .baseUrl(domoticzOswUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val service = retrofit.create(DomoticzOswService::class.java)
-        val call = service.getDevicesData()
+        val call = service.getDevicesData(domoticzOswLogin, domoticzOswPassword, type)
 
         call.enqueue(object : Callback<DeviceList>{
             override fun onFailure(call: Call<DeviceList>, t: Throwable) {
@@ -254,18 +318,20 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        val service = retrofit.create(OpenweathermapService::class.java)
-        val call = service.getDataFromOpenweathermap()
+        val serviceOW = retrofit.create(OpenweathermapService::class.java)
+        val callOW = serviceOW.getDataFromOpenweathermap()
 
-        call.enqueue(object : Callback<WeatherDataList>{
+
+        callOW.enqueue(object : Callback<WeatherDataList>{
             override fun onFailure(call: Call<WeatherDataList>, t: Throwable) {
-                Log.e(FUNNAME, t.toString())
+
             }
 
             override fun onResponse(
                 call: Call<WeatherDataList>,
                 response: Response<WeatherDataList>
             ) {
+
                 val weatherDatas = response.body()
 
                 val weatherIcon = weatherDatas?.weather?.get(0)?.icon
@@ -278,47 +344,7 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         })
     }
 
-    private fun showForecastFromOpen(){
-        val FUNNAME = "showForecastFromOpen"
 
-        val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl(OpenweathermapUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val service = retrofit.create(OpenweathermapService::class.java)
-        val call = service.getForecastFromOpenweathermap()
-
-        call.enqueue(object : Callback<WeatherForecastList>{
-            override fun onFailure(call: Call<WeatherForecastList>, t: Throwable) {
-                Log.e(FUNNAME, t.toString())
-            }
-
-            override fun onResponse(
-                call: Call<WeatherForecastList>,
-                response: Response<WeatherForecastList>
-            ) {
-                val weatherDatas = response.body()
-
-                //TODO tutaj dopisz kod który pokazuje prognozę pogody
-            }
-
-        })
-
-    }
-
-
-
-
-    companion object {
-
-        var BaseUrl = "http://188.117.181.24:4444/"
-        var login = "Y3p1am5paw=="
-        var password = "T3N3aWVjaW0zMjYwMA=="
-        var type = "devices"
-        var DomoticzOswUrl = "http://188.117.181.24:4444"
-        var OpenweathermapUrl = "http://api.openweathermap.org/data/2.5/"
-    }
 
     private fun getBitmapFromAssets(fileName: String): Bitmap {
         val assetManager = assets
