@@ -26,8 +26,8 @@ class SettingActivity : AppCompatActivity() {
         switchadvaced.isChecked = sharedPreference.getValueBoolean("advanced")!!
 
         //domoticz Server
-        domitczSerwer.setText(sharedPreference.getValueString("domitczSerwer"))
-        domitczPort.setText(sharedPreference.getValueString("domitczPort"))
+        domitczSerwer.setText(sharedPreference.getValueString("domoticzSerwer"))
+        domitczPort.setText(sharedPreference.getValueString("domoticzPort"))
         domoticzUsername.setText(sharedPreference.getValueString("domoticzUsername"))
         domoticzPassword.setText(sharedPreference.getValueString("domoticzPassword"))
 
@@ -50,8 +50,8 @@ class SettingActivity : AppCompatActivity() {
             sharedPreference.save("usernameMQTT", usernameMQTTString)
             sharedPreference.save("passwordMQTT", passwordMQTTString)
 
-            sharedPreference.save("domitczSerwer", domitczSerwerString)
-            sharedPreference.save("domitczPort", domoticzPortString)
+            sharedPreference.save("domoticzSerwer", domitczSerwerString)
+            sharedPreference.save("domoticzPort", domoticzPortString)
             sharedPreference.save("domoticzUsername", domoticzUsernameString)
             sharedPreference.save("domoticzPassword", domoticzPasswordString)
 

@@ -36,6 +36,7 @@ import android.support.v4.app.SupportActivity.ExtraData
 import android.support.v4.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.util.Base64
+import android.widget.Toast
 import cloud.dawid.myhome.data.*
 import java.io.IOException
 import java.io.InputStream
@@ -91,6 +92,13 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         //ustawia temperature na podstawie danych API z domoticz
         showDataFromDomoticzOswiecim()
 
+        textTempOswiecim.setOnClickListener{
+            showDataFromDomoticzOswiecim()
+            showWeatherFromOpenweathermap()
+            Toast.makeText(this, "odswiezam dane", Toast.LENGTH_SHORT).show()
+        }
+
+
         //pokazuje pogode (ikone) na podstawie danych z Openweathermaps API
         showWeatherFromOpenweathermap()
 
@@ -117,30 +125,30 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 //        PRZYCISKI
 
         btnGoraON.setOnClickListener {
-            sendMessage("pin12", "1")
-            shownotification("światło góra - ON ")
+            sendMessage("pin12", "false")
+            //shownotification("światło góra - ON ")
         }
         btnGoraOFF.setOnClickListener {
-            sendMessage("pin12", "0")
-            shownotification("światło góra - OFF ")
+            sendMessage("pin12", "true")
+           // shownotification("światło góra - OFF ")
         }
         btnDolON.setOnClickListener {
-            sendMessage("pin11", "1")
-            shownotification("światło doł - ON ")
+            sendMessage("pin11", "false")
+            //shownotification("światło doł - ON ")
         }
         btnDolOFF.setOnClickListener {
-            sendMessage("pin11", "0")
-            shownotification("światło dol - OFF ")
+            sendMessage("pin11", "true")
+            //shownotification("światło dol - OFF ")
         }
 
         btn_drzwi.setOnClickListener {
             sendMessage("opendoorintercom", "0")
-            shownotification("otwieram dzwi")
+           // shownotification("otwieram dzwi")
         }
 
         btn_alarm.setOnClickListener {
-            //sendMessage("alarmactivate", "0")
-            shownotification("zalaczam alarm")
+            sendMessage("alarmactivate", "0")
+            //shownotification("zalaczam alarm")
         }
 
 
@@ -176,21 +184,22 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
 
 //        //DOMOTICZ
-        var serverAdresDomoticz = sharedPreference.getValueBoolean("domitczSerwer").toString()
-        var serverPortDomoticz = sharedPreference.getValueBoolean("domoticzPortString").toString()
+        var serverAdresDomoticz = sharedPreference.getValueString("domoticzSerwer").toString()
+        var serverPortDomoticz = sharedPreference.getValueString("domoticzPort").toString()
 
-        if(serverAdresDomoticz=="" || serverAdresDomoticz == "false"){
+        if(serverAdresDomoticz=="" || serverAdresDomoticz=="null"){
             serverAdresDomoticz = "127.0.0.1"
             error_on_top.text = "Uzupelnij dane logowania do Domoticza"
         }
-        if(serverPortDomoticz=="" || serverPortDomoticz == "false"){
+        if(serverPortDomoticz=="" || serverPortDomoticz=="null"){
             serverPortDomoticz = "1111"
             error_on_top.text = "Uzupelnij dane logowania do Domoticza"
         }
 
+
         domoticzOswUrl = "http://" + serverAdresDomoticz + ":" + serverPortDomoticz
-        domoticzOswLogin = sharedPreference.getValueBoolean("domoticzUsername").toString()
-        domoticzOswPassword = sharedPreference.getValueBoolean("domoticzPassword").toString()
+        domoticzOswLogin = sharedPreference.getValueString("domoticzUsername").toString()
+        domoticzOswPassword = sharedPreference.getValueString("domoticzPassword").toString()
 
         if(domoticzOswLogin==""){
             domoticzOswLogin = "brak"
@@ -200,10 +209,6 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
             domoticzOswPassword = "brak"
             error_on_top.text = "Uzupelnij dane logowania do Domoticza"
         }
-
-//        domoticzOswUrl = "http://188.117.181.24:4444"
-//        domoticzOswLogin = "YXBp"
-//        domoticzOswPassword = "b3N3"
 
     }
 
@@ -319,8 +324,7 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
         callOW.enqueue(object : Callback<WeatherDataList>{
             override fun onFailure(call: Call<WeatherDataList>, t: Throwable) {
-                Log.e(FUNNAME, t.toString())
-                Log.e(FUNNAME, "jakas dupa")
+
             }
 
             override fun onResponse(
@@ -340,44 +344,6 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         })
     }
 
-    private fun showForecastFromOpen(){
-        val FUNNAME = "showForecastFromOpen"
-
-        val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl(OpenweathermapUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val service = retrofit.create(OpenweathermapService::class.java)
-        val call = service.getForecastFromOpenweathermap()
-
-        call.enqueue(object : Callback<WeatherForecastList>{
-            override fun onFailure(call: Call<WeatherForecastList>, t: Throwable) {
-                Log.e(FUNNAME, t.toString())
-            }
-
-            override fun onResponse(
-                call: Call<WeatherForecastList>,
-                response: Response<WeatherForecastList>
-            ) {
-                val weatherDatas = response.body()
-
-                //TODO tutaj dopisz kod który pokazuje prognozę pogody
-            }
-
-        })
-
-    }
-
-
-
-
-    companion object {
-
-
-
-
-    }
 
 
     private fun getBitmapFromAssets(fileName: String): Bitmap {
